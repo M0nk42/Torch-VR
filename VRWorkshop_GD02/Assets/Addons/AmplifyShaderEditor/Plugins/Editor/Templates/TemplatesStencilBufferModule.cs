@@ -93,10 +93,12 @@ namespace AmplifyShaderEditor
             }
         }
 
-		public void CopyFrom( TemplatesStencilBufferModule other )
+		public void CopyFrom( TemplatesStencilBufferModule other , bool allData )
 		{
+			if( allData )
+				m_independentModule = other.IndependentModule;
+
 			m_active = other.Active;
-			m_independentModule = other.IndependentModule;
 			m_reference.CopyFrom( other.Reference );
 			m_readMask.CopyFrom( other.ReadMask );
 			m_writeMask.CopyFrom( other.WriteMask );

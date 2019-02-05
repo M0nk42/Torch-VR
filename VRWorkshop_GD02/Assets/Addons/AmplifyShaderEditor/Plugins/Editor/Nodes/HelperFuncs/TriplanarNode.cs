@@ -114,23 +114,23 @@ namespace AmplifyShaderEditor
 		};
 
 		private readonly List<string> m_functionSamplingBodySignsSphere = new List<string>() {
-			"xNorm.xyz = half3( UnpackNormal( xNorm ).xy * float2( nsign.x, 1.0 ) + worldNormal.zy, worldNormal.x ).zyx;",
-			"yNorm.xyz = half3( UnpackNormal( yNorm ).xy * float2( nsign.y, 1.0 ) + worldNormal.xz, worldNormal.y ).xzy;",
-			"zNorm.xyz = half3( UnpackNormal( zNorm ).xy * float2( -nsign.z, 1.0 ) + worldNormal.xy, worldNormal.z ).xyz;"
+			"xNorm.xyz = half3( {0}( xNorm{1} ).xy * float2( nsign.x, 1.0 ) + worldNormal.zy, worldNormal.x ).zyx;",
+			"yNorm.xyz = half3( {0}( yNorm{1} ).xy * float2( nsign.y, 1.0 ) + worldNormal.xz, worldNormal.y ).xzy;",
+			"zNorm.xyz = half3( {0}( zNorm{1} ).xy * float2( -nsign.z, 1.0 ) + worldNormal.xy, worldNormal.z ).xyz;"
 		};
 
 		private readonly List<string> m_functionSamplingBodySignsSphereScale = new List<string>() {
-			"xNorm.xyz = half3( UnpackScaleNormal( xNorm, normalScale.y ).xy * float2( nsign.x, 1.0 ) + worldNormal.zy, worldNormal.x ).zyx;",
-			"yNorm.xyz = half3( UnpackScaleNormal( yNorm, normalScale.x ).xy * float2( nsign.y, 1.0 ) + worldNormal.xz, worldNormal.y ).xzy;",
-			"zNorm.xyz = half3( UnpackScaleNormal( zNorm, normalScale.y ).xy * float2( -nsign.z, 1.0 ) + worldNormal.xy, worldNormal.z ).xyz;"
+			"xNorm.xyz = half3( {0}( xNorm, normalScale.y ).xy * float2( nsign.x, 1.0 ) + worldNormal.zy, worldNormal.x ).zyx;",
+			"yNorm.xyz = half3( {0}( yNorm, normalScale.x ).xy * float2( nsign.y, 1.0 ) + worldNormal.xz, worldNormal.y ).xzy;",
+			"zNorm.xyz = half3( {0}( zNorm, normalScale.y ).xy * float2( -nsign.z, 1.0 ) + worldNormal.xy, worldNormal.z ).xyz;"
 		};
 
 		private readonly List<string> m_functionSamplingBodySignsCylinder = new List<string>() {
-			"yNormN.xyz = half3( UnpackNormal( yNormN ).xy * float2( nsign.y, 1.0 ) + worldNormal.xz, worldNormal.y ).xzy;"
+			"yNormN.xyz = half3( {0}( yNormN {1} ).xy * float2( nsign.y, 1.0 ) + worldNormal.xz, worldNormal.y ).xzy;"
 		};
 
 		private readonly List<string> m_functionSamplingBodySignsCylinderScale = new List<string>() {
-			"yNormN.xyz = half3( UnpackScaleNormal( yNormN, normalScale.z ).xy * float2( nsign.y, 1.0 ) + worldNormal.xz, worldNormal.y ).xzy;"
+			"yNormN.xyz = half3( {0}( yNormN, normalScale.z ).xy * float2( nsign.y, 1.0 ) + worldNormal.xz, worldNormal.y ).xzy;"
 		};
 
 		private readonly List<string> m_functionSamplingBodyReturnSphereNormalize = new List<string>() {
@@ -148,6 +148,41 @@ namespace AmplifyShaderEditor
 		private readonly List<string> m_functionSamplingBodyReturnCylinder = new List<string>() {
 			"return xNorm * projNormal.x + yNorm * projNormal.y + yNormN * negProjNormalY + zNorm * projNormal.z;"
 		};
+
+		private Rect m_allPicker;
+		private Rect m_startPicker;
+		private Rect m_pickerButton;
+		private bool m_editing;
+
+		void ConvertListTo( MasterNodeDataCollector dataCollector, bool scaleInfo , List<string> original , List<string> dest )
+		{
+			int count = original.Count;
+			string scale = string.Empty;
+			string func = string.Empty;
+			bool applyScale = false;
+			if( dataCollector.IsTemplate && dataCollector.IsSRP )
+			{
+				func = "UnpackNormalmapRGorAG";
+				if( !scaleInfo )
+				{
+					scale = " , 1.0";
+					applyScale = true;
+				}
+			}
+			else
+			{
+				func = scaleInfo? "UnpackScaleNormal": "UnpackNormal";
+				applyScale = !scaleInfo;
+			}
+
+			for(int i = 0; i < count; i++ )
+			{
+				if( applyScale )
+					dest.Add( string.Format( original[ i ], func, scale ));
+				else
+					dest.Add( string.Format( original[ i ], func ) );
+			}
+		}
 
 		protected override void CommonInit( int uniqueId )
 		{
@@ -667,10 +702,7 @@ namespace AmplifyShaderEditor
 			m_pickerButton.y = m_startPicker.yMax - m_pickerButton.height - 2;
 		}
 
-		private Rect m_allPicker;
-		private Rect m_startPicker;
-		private Rect m_pickerButton;
-		private bool m_editing;
+
 
 		public override void DrawGUIControls( DrawInfo drawInfo )
 		{
@@ -736,7 +768,7 @@ namespace AmplifyShaderEditor
 					{
 						if( newValue != (UnityEngine.Object)m_botTexture.Value )
 						{
-							UndoRecordObject( this, "Changing value EditorGUIObjectField on node Triplanar Node" );
+							UndoRecordObject( "Changing value EditorGUIObjectField on node Triplanar Node" );
 							m_botTexture.Value = newValue != null ? (Texture2D)newValue : null;
 
 							if( m_materialMode )
@@ -747,7 +779,7 @@ namespace AmplifyShaderEditor
 					{
 						if( newValue != (UnityEngine.Object)m_midTexture.Value )
 						{
-							UndoRecordObject( this, "Changing value EditorGUIObjectField on node Triplanar Node" );
+							UndoRecordObject( "Changing value EditorGUIObjectField on node Triplanar Node" );
 							m_midTexture.Value = newValue != null ? (Texture2D)newValue : null;
 
 							if( m_materialMode )
@@ -758,7 +790,7 @@ namespace AmplifyShaderEditor
 					{
 						if( newValue != (UnityEngine.Object)m_topTexture.Value )
 						{
-							UndoRecordObject( this, "Changing value EditorGUIObjectField on node Triplanar Node" );
+							UndoRecordObject( "Changing value EditorGUIObjectField on node Triplanar Node" );
 							m_topTexture.Value = newValue != null ? (Texture2D)newValue : null;
 
 							if( m_materialMode )
@@ -1065,9 +1097,15 @@ namespace AmplifyShaderEditor
 				{
 					headerID += "N";
 					if( scaleNormals )
-						triplanarBody.AddRange( m_functionSamplingBodySignsSphereScale );
+					{
+						ConvertListTo( dataCollector, true, m_functionSamplingBodySignsSphereScale, triplanarBody );
+						//triplanarBody.AddRange( m_functionSamplingBodySignsSphereScale );
+					}
 					else
-						triplanarBody.AddRange( m_functionSamplingBodySignsSphere );
+					{
+						ConvertListTo( dataCollector, false, m_functionSamplingBodySignsSphere, triplanarBody );
+						//triplanarBody.AddRange( m_functionSamplingBodySignsSphere );
+					}
 					triplanarBody.AddRange( m_functionSamplingBodyReturnSphereNormalize );
 				}
 				else
@@ -1089,13 +1127,17 @@ namespace AmplifyShaderEditor
 					headerID += "N";
 					if( scaleNormals )
 					{
-						triplanarBody.AddRange( m_functionSamplingBodySignsSphereScale );
-						triplanarBody.AddRange( m_functionSamplingBodySignsCylinderScale );
+						//triplanarBody.AddRange( m_functionSamplingBodySignsSphereScale );
+						ConvertListTo( dataCollector, true, m_functionSamplingBodySignsSphereScale, triplanarBody );
+						ConvertListTo( dataCollector, true, m_functionSamplingBodySignsCylinderScale, triplanarBody );
+						//triplanarBody.AddRange( m_functionSamplingBodySignsCylinderScale );
 					}
 					else
 					{
-						triplanarBody.AddRange( m_functionSamplingBodySignsSphere );
-						triplanarBody.AddRange( m_functionSamplingBodySignsCylinder );
+						//triplanarBody.AddRange( m_functionSamplingBodySignsSphere );
+						ConvertListTo( dataCollector, false, m_functionSamplingBodySignsSphere, triplanarBody );
+						ConvertListTo( dataCollector, false, m_functionSamplingBodySignsCylinder, triplanarBody );
+						//triplanarBody.AddRange( m_functionSamplingBodySignsCylinder );
 					}
 					triplanarBody.AddRange( m_functionSamplingBodyReturnCylinderNormalize );
 				}
@@ -1153,22 +1195,24 @@ namespace AmplifyShaderEditor
 
 			if( m_selectedTriplanarSpace == TriplanarSpace.Object )
 			{
+				string worldToObjectMatrix = ( dataCollector.IsTemplate && dataCollector.TemplateDataCollectorInstance.CurrentSRPType == TemplateSRPType.HD ) ? "GetWorldToObjectMatrix()" : "unity_WorldToObject";
+
 				if( m_normalCorrection )
 				{
-					dataCollector.AddLocalVariable( UniqueId, "float3 localTangent = mul( unity_WorldToObject, float4( " + GeneratorUtils.WorldTangentStr + ", 0 ) );" );
-					dataCollector.AddLocalVariable( UniqueId, "float3 localBitangent = mul( unity_WorldToObject, float4( " + GeneratorUtils.WorldBitangentStr + ", 0 ) );" );
-					dataCollector.AddLocalVariable( UniqueId, "float3 localNormal = mul( unity_WorldToObject, float4( " + GeneratorUtils.WorldNormalStr + ", 0 ) );" );
+					dataCollector.AddLocalVariable( UniqueId, "float3 localTangent = mul( "+ worldToObjectMatrix + " , float4( " + GeneratorUtils.WorldTangentStr + ", 0 ) );" );
+					dataCollector.AddLocalVariable( UniqueId, "float3 localBitangent = mul( " + worldToObjectMatrix + ", float4( " + GeneratorUtils.WorldBitangentStr + ", 0 ) );" );
+					dataCollector.AddLocalVariable( UniqueId, "float3 localNormal = mul( " + worldToObjectMatrix + ", float4( " + GeneratorUtils.WorldNormalStr + ", 0 ) );" );
 					norm = "localNormal";
 					dataCollector.AddLocalVariable( UniqueId, "float3x3 objectToTangent = float3x3(localTangent, localBitangent, localNormal);" );
-					dataCollector.AddLocalVariable( UniqueId, "float3 localPos = mul( unity_WorldToObject, float4( " + pos + ", 1 ) );" );
+					dataCollector.AddLocalVariable( UniqueId, "float3 localPos = mul( " + worldToObjectMatrix + ", float4( " + pos + ", 1 ) );" );
 					pos = "localPos";
 					worldToTangent = "objectToTangent";
 				}
 				else
 				{
-					dataCollector.AddToLocalVariables( dataCollector.PortCategory, UniqueId, "float3 localPos = mul( unity_WorldToObject, float4( " + pos + ", 1 ) );" );
+					dataCollector.AddToLocalVariables( dataCollector.PortCategory, UniqueId, "float3 localPos = mul( " + worldToObjectMatrix + ", float4( " + pos + ", 1 ) );" );
 					pos = "localPos";
-					dataCollector.AddToLocalVariables( dataCollector.PortCategory, UniqueId, "float3 localNormal = mul( unity_WorldToObject, float4( " + norm + ", 0 ) );" );
+					dataCollector.AddToLocalVariables( dataCollector.PortCategory, UniqueId, "float3 localNormal = mul( " + worldToObjectMatrix + ", float4( " + norm + ", 0 ) );" );
 					norm = "localNormal";
 				}
 			}

@@ -116,10 +116,12 @@ namespace AmplifyShaderEditor
 			m_currentParameterType = PropertyType.Property;
 			m_customPrefix = "Texture ";
 			m_drawPrecisionUI = false;
+			m_showVariableMode = true;
 			m_freeType = false;
 			m_drawPicker = true;
 			m_hasLeftDropdown = true;
 			m_textLabelWidth = 115;
+			m_longNameSize = 225;
 			m_availableAttribs.Add( new PropertyAttributes( "No Scale Offset", "[NoScaleOffset]" ) );
 			m_availableAttribs.Add( new PropertyAttributes( "Normal", "[Normal]" ) );
 			m_showPreview = true;
@@ -494,7 +496,7 @@ namespace AmplifyShaderEditor
 #else
 				m_isNormalMap = importer.normalmap;
 #endif
-				if( writeDefault && !m_containerGraph.IsLoading )
+				if( writeDefault && !UIUtils.IsLoading )
 				{
 					if( m_defaultTextureValue == TexturePropertyValues.bump && !m_isNormalMap )
 						m_defaultTextureValue = TexturePropertyValues.white;
@@ -936,7 +938,8 @@ namespace AmplifyShaderEditor
 		{
 			if( m_currentType == TextureType.Texture2DArray )
 			{
-				if( m_containerGraph.CurrentMasterNode.CurrentDataCollector.IsTemplate && m_containerGraph.CurrentMasterNode.CurrentDataCollector.TemplateDataCollectorInstance.CurrentSRPType == TemplateSRPType.Lightweight )
+				MasterNode masterNode = UIUtils.CurrentWindow.OutsideGraph.CurrentMasterNode;
+				if( masterNode.CurrentDataCollector.IsTemplate && masterNode.CurrentDataCollector.IsSRP )
 				{
 					dataType = "TEXTURE2D_ARRAY( " + PropertyName + "";
 					dataName = ");\nuniform SAMPLER( sampler" + PropertyName + " )";

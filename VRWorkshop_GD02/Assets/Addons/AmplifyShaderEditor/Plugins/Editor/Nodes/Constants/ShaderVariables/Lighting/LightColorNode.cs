@@ -36,14 +36,24 @@ namespace AmplifyShaderEditor
 
 		public override string GenerateShaderForOutput( int outputId, ref MasterNodeDataCollector dataCollector, bool ignoreLocalvar )
 		{
-			if( dataCollector.IsTemplate && !dataCollector.IsLightweight )
+			if( dataCollector.IsTemplate && !dataCollector.IsSRP )
 				dataCollector.AddToIncludes( -1, Constants.UnityLightingLib );
 
 			base.GenerateShaderForOutput( outputId, ref dataCollector, ignoreLocalvar );
 
 			string finalVar = m_lightColorValue;
-			if( dataCollector.IsTemplate && dataCollector.IsLightweight )
-				finalVar = "_MainLightColor";
+			if( dataCollector.IsTemplate && dataCollector.IsSRP )
+			{
+				if( dataCollector.TemplateDataCollectorInstance.CurrentSRPType == TemplateSRPType.HD )
+				{
+					dataCollector.TemplateDataCollectorInstance.AddHDLightInfo();
+					finalVar = string.Format( TemplateHelperFunctions.HDLightInfoFormat, "0", "color" ); ;
+				}
+				else
+				{
+					finalVar = "_MainLightColor";
+				}
+			}
 			else
 			{
 				dataCollector.AddLocalVariable( UniqueId, "#if defined(LIGHTMAP_ON) && UNITY_VERSION < 560 //aselc" );

@@ -666,21 +666,19 @@ namespace AmplifyShaderEditor
 						isScaledNormal = true;
 					}
 				}
-				if( isScaledNormal )
+
+				string scaleValue = isScaledNormal?m_normalPort.GeneratePortInstructions( ref dataCollector ):"1.0";
+				m_normalMapUnpackMode = TemplateHelperFunctions.CreateUnpackNormalStr( dataCollector, isScaledNormal, scaleValue );
+				if(  isScaledNormal && (! dataCollector.IsTemplate || !dataCollector.IsSRP ))
 				{
-					string scaleValue = m_normalPort.GeneratePortInstructions( ref dataCollector );
 					dataCollector.AddToIncludes( UniqueId, Constants.UnityStandardUtilsLibFuncs );
-					m_normalMapUnpackMode = "UnpackScaleNormal( {0} ," + scaleValue + " )";
 				}
-				else
-				{
-					m_normalMapUnpackMode = "UnpackNormal( {0} )";
-				}
+				
 			}
 
 			string result = string.Empty;
 
-			if( dataCollector.IsTemplate && dataCollector.TemplateDataCollectorInstance.CurrentSRPType == TemplateSRPType.Lightweight )
+			if( dataCollector.IsTemplate && dataCollector.IsSRP )
 			{
 				//CAREFUL mipbias here means derivative (this needs index changes)
 				//TODO: unity now supports bias as well
@@ -752,7 +750,8 @@ namespace AmplifyShaderEditor
 
 		public override bool GetUniformData( out string dataType, out string dataName )
 		{
-			if( m_containerGraph.CurrentMasterNode.CurrentDataCollector.IsTemplate && m_containerGraph.CurrentMasterNode.CurrentDataCollector.TemplateDataCollectorInstance.CurrentSRPType == TemplateSRPType.Lightweight )
+			MasterNode currMasterNode = ( m_containerGraph.CurrentMasterNode != null ) ? m_containerGraph.CurrentMasterNode : m_containerGraph.ParentWindow.OutsideGraph.CurrentMasterNode;
+			if( currMasterNode != null && currMasterNode.CurrentDataCollector.IsTemplate && currMasterNode.CurrentDataCollector.IsSRP )
 			{
 				dataType = "TEXTURE2D_ARRAY( " + PropertyName + "";
 				dataName = ");\nuniform SAMPLER( sampler" + PropertyName + " )";

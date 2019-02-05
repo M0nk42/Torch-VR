@@ -9,6 +9,30 @@ namespace AmplifyShaderEditor
 
 	public struct Constants
 	{
+		public readonly static string AppDataFullName = "appdata_full";
+		public readonly static string CustomAppDataFullName = "appdata_full_custom";
+		public readonly static string CustomAppDataFullBody =
+		"\n\t\tstruct appdata_full_custom\n" +
+		"\t\t{\n" +
+		"\t\t\tfloat4 vertex : POSITION;\n" +
+		"\t\t\tfloat4 tangent : TANGENT;\n" +
+		"\t\t\tfloat3 normal : NORMAL;\n" +
+		"\t\t\tfloat4 texcoord : TEXCOORD0;\n" +
+		"\t\t\tfloat4 texcoord1 : TEXCOORD1;\n" +
+		"\t\t\tfloat4 texcoord2 : TEXCOORD2;\n" +
+		"\t\t\tfloat4 texcoord3 : TEXCOORD3;\n" +
+		"\t\t\tfixed4 color : COLOR;\n" +
+		"\t\t\tUNITY_VERTEX_INPUT_INSTANCE_ID\n";
+		
+		public readonly static string IncludeFormat = "#include \"{0}\"";
+		public readonly static string PragmaFormat = "#pragma {0}";
+		public readonly static string DefineFormat = "#define {0}";
+
+		public readonly static string RenderTypeHelperStr = "RenderType";
+		public readonly static string RenderQueueHelperStr = "Queue";
+
+		public readonly static string DefaultShaderName = "New Amplify Shader";
+
 		public readonly static string UndoReplaceMasterNodeId = "Replacing Master Node";
 		public readonly static string UnityLightingLib = "Lighting.cginc";
 		public readonly static string UnityAutoLightLib = "AutoLight.cginc";
@@ -19,6 +43,8 @@ namespace AmplifyShaderEditor
 		public static string InvalidPostProcessDatapath = "__DELETED_GUID_Trash";
 		//TEMPLATES
 
+		public static float PlusMinusButtonLayoutWidth = 15;
+
 		public static float NodeButtonSizeX = 16;
 		public static float NodeButtonSizeY = 16;
 		public static float NodeButtonDeltaX = 5;
@@ -27,6 +53,7 @@ namespace AmplifyShaderEditor
 		public readonly static string ReservedPropertyNameStr = "Property name '{0}' is reserved and cannot be used";
 		public readonly static string NumericPropertyNameStr = "Property name '{0}' is numeric thus cannot be used";
 		public readonly static string DeprecatedMessageStr = "Node '{0}' is deprecated. Use node '{1}' instead.";
+		public readonly static string DeprecatedNoAlternativeMessageStr = "Node '{0}' is deprecated and should be removed.";
 		public readonly static string UndoChangePropertyTypeNodesId = "Changing Property Types";
 		public readonly static string UndoChangeTypeNodesId = "Changing Nodes Types";
 		public readonly static string UndoMoveNodesId = "Moving Nodes";
@@ -47,7 +74,7 @@ namespace AmplifyShaderEditor
 		public readonly static string DefaultCustomInspector = "ASEMaterialInspector";
 		public readonly static string ReferenceTypeStr = "Mode";
 		public readonly static string AvailableReferenceStr = "Reference";
-		public readonly static string InstancePostfixStr = " (Instance) ";
+		public readonly static string InstancePostfixStr = " (Reference) ";
 
 		public readonly static string ASEMenuName = "Amplify Shader";
 
@@ -139,8 +166,6 @@ namespace AmplifyShaderEditor
 		public readonly static string SubTitleVarNameFormatStr = "Var( {0} )";
 
 		public readonly static string CodeWrapper = "( {0} )";
-		public readonly static string UnpackNormal = "UnpackNormal( {0} )";
-		public readonly static string UnpackNormalScale = "UnpackNormal( {0} , {1} )";
 
 		public readonly static string NodesDumpFormat = "{0}:,{1},{2}\n";
 		public readonly static string TagFormat = " \"{0}\" = \"{1}\"";
@@ -278,17 +303,27 @@ namespace AmplifyShaderEditor
 
 		public readonly static Color LockedPortColor = new Color( 0.3f, 0.3f, 0.3f, 0.5f );
 
+#if UNITY_2018_2_OR_NEWER
+		public readonly static int[] AvailableUVChannels = { 0, 1, 2, 3, 4, 5, 6, 7 };
+		public readonly static string[] AvailableUVChannelsStr = { "0", "1", "2", "3", "4", "5", "6", "7"};
+		public readonly static string AvailableUVChannelLabel = "UV Channel";
+
+		public readonly static int[] AvailableUVSets = { 0, 1, 2, 3, 4, 5, 6, 7 };
+		public readonly static string[] AvailableUVSetsStr = { "1", "2", "3", "4","5", "6", "7", "8" };
+		public readonly static string AvailableUVSetsLabel = "UV Set";
+#else
 		public readonly static int[] AvailableUVChannels = { 0, 1, 2, 3 };
 		public readonly static string[] AvailableUVChannelsStr = { "0", "1", "2", "3" };
 		public readonly static string AvailableUVChannelLabel = "UV Channel";
 
-		public readonly static int[] AvailableUVSizes = { 2, 3, 4 };
-		public readonly static string[] AvailableUVSizesStr = { "Float 2", "Float 3", "Float 4" };
-		public readonly static string AvailableUVSizesLabel = "Coord Size";
-
 		public readonly static int[] AvailableUVSets = { 0, 1, 2, 3 };
 		public readonly static string[] AvailableUVSetsStr = { "1", "2", "3", "4" };
 		public readonly static string AvailableUVSetsLabel = "UV Set";
+#endif
+
+		public readonly static int[] AvailableUVSizes = { 2, 3, 4 };
+		public readonly static string[] AvailableUVSizesStr = { "Float 2", "Float 3", "Float 4" };
+		public readonly static string AvailableUVSizesLabel = "Coord Size";
 
 
 		public readonly static string LineSeparator = "________________________________";

@@ -1,4 +1,4 @@
-Shader /*ase_name*/"ASETemplateShaders/Legacy/Sprites Default"/*end*/
+Shader /*ase_name*/"Hidden/Templates/Legacy/Sprites Default"/*end*/
 {
 	Properties
 	{
@@ -24,8 +24,8 @@ Shader /*ase_name*/"ASETemplateShaders/Legacy/Sprites Default"/*end*/
 		Lighting Off
 		ZWrite Off
 		Blend One OneMinusSrcAlpha
-		/*ase_pass*/
 		
+		/*ase_pass*/
 		Pass
 		{
 		CGPROGRAM

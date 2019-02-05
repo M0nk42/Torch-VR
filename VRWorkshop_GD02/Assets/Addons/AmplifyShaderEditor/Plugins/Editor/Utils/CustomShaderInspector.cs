@@ -166,24 +166,39 @@ namespace UnityEditor
 				GUI.DrawTexture( r, resultRender, ScaleMode.StretchToFill, false );
 			}
 		}
-
+		
 		void OnDestroy()
 		{
-			if ( m_previewRenderUtility != null )
+			CleanUp();
+		}
+
+		public void OnDisable()
+		{
+			CleanUp();
+		}
+		
+		void CleanUp()
+		{
+			if( m_previewRenderUtility != null )
 			{
 				m_previewRenderUtility.Cleanup();
 				m_previewRenderUtility = null;
 			}
 
-			if ( m_previewMesh != null )
+			if( m_previewMesh != null )
 			{
 				Resources.UnloadAsset( m_previewMesh );
 				m_previewMesh = null;
 			}
 
+			if( m_previewRenderUtility != null )
+			{
+				m_previewRenderUtility.Cleanup();
+				m_previewRenderUtility = null;
+			}
 			m_material = null;
 		}
-		
+
 		public virtual void OnEnable()
 		{
 			Shader s = this.target as Shader;

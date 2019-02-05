@@ -189,7 +189,14 @@ namespace AmplifyShaderEditor
 			else
 				return string.Empty;
 		}
-
+		public string KeywordEnumList(int index)
+		{
+			if( m_variableMode == VariableMode.Fetch )
+				return m_keywordEnumList[index];
+			else
+				return m_keywordEnumList[index].ToUpper();
+			
+		}
 		public override string PropertyName
 		{
 			get
@@ -230,9 +237,9 @@ namespace AmplifyShaderEditor
 			for( int i = 0; i < m_keywordEnumList.Length; i++ )
 			{
 				if( i == 0 )
-					result = PropertyName + "_" + m_keywordEnumList[ i ].ToUpper();
+					result = PropertyName + "_" + KeywordEnumList(i);
 				else
-					result += " " + PropertyName + "_" + m_keywordEnumList[ i ].ToUpper();
+					result += " " + PropertyName + "_" + KeywordEnumList( i );
 			}
 			return result;
 		}
@@ -263,6 +270,7 @@ namespace AmplifyShaderEditor
 			m_keywordEnumAmount = EditorGUILayoutIntSlider( AmountStr, m_keywordEnumAmount, 2, 9 );
 			if( EditorGUI.EndChangeCheck() )
 			{
+				CurrentSelectedInput = Mathf.Clamp( CurrentSelectedInput, 0, m_keywordEnumAmount - 1 );
 				UpdateLabels();
 			}
 			EditorGUI.indentLevel++;
@@ -284,7 +292,7 @@ namespace AmplifyShaderEditor
 		public void UpdateLabels()
 		{
 			int maxinputs = m_keywordModeType == KeywordModeType.KeywordEnum ? m_keywordEnumAmount : 2;
-
+			m_keywordEnumAmount = Mathf.Clamp( m_keywordEnumAmount, 0, maxinputs );
 			m_keywordEnumList = new string[ maxinputs ];
 
 			for( int i = 0; i < maxinputs; i++ )
@@ -365,6 +373,7 @@ namespace AmplifyShaderEditor
 			else
 			{
 				ShowPropertyInspectorNameGUI();
+				ShowPropertyNameGUI( true );
 				DrawEnumList();
 			}
 
@@ -619,7 +628,7 @@ namespace AmplifyShaderEditor
 
 				for( int i = 0; i < m_keywordEnumAmount; i++ )
 				{
-					string keyword = PropertyName + "_" + m_keywordEnumList[ i ].ToUpper(); ;
+					string keyword = PropertyName + "_" + KeywordEnumList( i );
 					if( i == 0 )
 						dataCollector.AddLocalVariable( UniqueId, "#if defined(" + keyword + ")", true );
 					else
@@ -672,10 +681,10 @@ namespace AmplifyShaderEditor
 				{
 					for( int i = 0; i < m_keywordEnumAmount; i++ )
 					{
-						string key = PropertyName + "_" + m_keywordEnumList[ i ].ToUpper();
+						string key = PropertyName + "_" + KeywordEnumList( i );
 						mat.DisableKeyword( key );
 					}
-					mat.EnableKeyword( PropertyName + "_" + m_keywordEnumList[ m_materialValue ].ToUpper() );
+					mat.EnableKeyword( PropertyName + "_" + KeywordEnumList( m_materialValue ));
 				}
 				else
 				{

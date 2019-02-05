@@ -26,9 +26,11 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private InlineProperty m_inlineColorMask = new InlineProperty();
 
-		public void CopyFrom( TemplateColorMaskModule other )
+		public void CopyFrom( TemplateColorMaskModule other, bool allData )
 		{
-			m_independentModule = other.IndependentModule;
+			if( allData )
+				m_independentModule = other.IndependentModule;
+
 			for( int i = 0; i < m_colorMask.Length; i++ )
 			{
 				m_colorMask[ i ] = other.ColorMask[ i ];

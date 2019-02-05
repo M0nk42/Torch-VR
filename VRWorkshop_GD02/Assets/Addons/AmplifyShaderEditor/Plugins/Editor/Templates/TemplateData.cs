@@ -118,7 +118,7 @@ namespace AmplifyShaderEditor
 		public TemplateData( string name )
 		{
 			m_templateType = TemplateDataType.LegacySinglePass;
-			m_name = name;
+			Name = name;
 		}
 
 		public TemplateData( string name, string guid )
@@ -149,7 +149,7 @@ namespace AmplifyShaderEditor
 				if( !string.IsNullOrEmpty( body ) )
 				{
 					LoadTemplateBody( body );
-					m_name = string.IsNullOrEmpty( name ) ? m_defaultShaderName : name;
+					Name = string.IsNullOrEmpty( name ) ? m_defaultShaderName : name;
 					m_guid = guid;
 				}
 			}
@@ -162,12 +162,12 @@ namespace AmplifyShaderEditor
 			if( !string.IsNullOrEmpty( body ) )
 			{
 				LoadTemplateBody( body );
-				m_name = string.IsNullOrEmpty( name ) ? m_defaultShaderName : name;
+				Name = string.IsNullOrEmpty( name ) ? m_defaultShaderName : name;
 				m_guid = guid;
 			}
 		}
 
-		public override void Reload()
+		public override bool Reload()
 		{
 			if( m_vertexDataContainer != null )
 			{
@@ -239,8 +239,9 @@ namespace AmplifyShaderEditor
 			LoadTemplateBody( body );
 			if( m_communityTemplate )
 			{
-				m_name = m_defaultShaderName;
+				Name = m_defaultShaderName;
 			}
+			return true;
 		}
 
 		void LoadTemplateBody( string body )

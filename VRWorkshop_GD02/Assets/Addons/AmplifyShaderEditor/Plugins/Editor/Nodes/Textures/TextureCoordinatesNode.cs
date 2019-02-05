@@ -187,7 +187,16 @@ namespace AmplifyShaderEditor
 				UpdateOutput();
 			}
 
+			EditorGUI.BeginChangeCheck();
 			m_textureCoordChannel = EditorGUILayoutIntPopup( Constants.AvailableUVSetsLabel, m_textureCoordChannel, Constants.AvailableUVSetsStr, Constants.AvailableUVSets );
+			if( EditorGUI.EndChangeCheck() )
+			{
+				if( m_textureCoordChannel > 3 && m_containerGraph.IsStandardSurface )
+				{
+					UIUtils.ShowMessage( "Standard Surface doesn't allow access to this channel" );
+					m_textureCoordChannel = 0;
+				}
+			}
 
 			if( m_referenceArrayId > -1 )
 				GUI.enabled = false;
@@ -320,6 +329,11 @@ namespace AmplifyShaderEditor
 			{
 				base.PropagateNodeData( nodeData, ref dataCollector );
 				return;
+			}
+
+			if( dataCollector.IsTemplate )
+			{
+				dataCollector.TemplateDataCollectorInstance.SetUVUsage( m_textureCoordChannel, m_texcoordSize );
 			}
 
 			UIUtils.SetCategoryInBitArray( ref m_category, nodeData.Category );
@@ -675,6 +689,17 @@ namespace AmplifyShaderEditor
 				}
 			}
 		}
+
+		public override void OnMasterNodeReplaced( MasterNode newMasterNode )
+		{
+			base.OnMasterNodeReplaced( newMasterNode );
+			if( m_textureCoordChannel > 3 && newMasterNode is StandardSurfaceOutputNode )
+			{
+				m_textureCoordChannel = 0;
+				UIUtils.ShowMessage( "Resetting channel on Texture Coordinates node.\nStandard Surface only allows usage of the first four." );
+			}
+		}
+
 		public override void Destroy()
 		{
 			base.Destroy();

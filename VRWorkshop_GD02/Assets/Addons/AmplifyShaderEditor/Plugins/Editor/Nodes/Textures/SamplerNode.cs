@@ -32,11 +32,16 @@ namespace AmplifyShaderEditor
 
 	[Serializable]
 #if UNITY_2018_1_OR_NEWER
-	[NodeAttributes( "Texture Sample", "Textures", "Samples a chosen texture and returns its color values, <b>Texture</b> and <b>UVs</b> can be overriden and you can select different mip modes and levels. It can also unpack and scale textures marked as normalmaps.", KeyCode.T, true, 0, int.MaxValue, typeof( Texture ), typeof( Texture2D ), typeof( Texture3D ), typeof( Cubemap ))]
+	[NodeAttributes( "Texture Sample", "Textures", "Samples a chosen texture and returns its color values, <b>Texture</b> and <b>UVs</b> can be overriden and you can select different mip modes and levels. It can also unpack and scale textures marked as normalmaps.", KeyCode.T, true, 0, int.MaxValue, typeof( Texture ), typeof( Texture2D ), typeof( Texture3D ), typeof( Cubemap ), typeof( CustomRenderTexture ))]
 #else
+
 	// Disabling Substance Deprecated warning
 #pragma warning disable 0618
-	[NodeAttributes( "Texture Sample", "Textures", "Samples a chosen texture and returns its color values, <b>Texture</b> and <b>UVs</b> can be overriden and you can select different mip modes and levels. It can also unpack and scale textures marked as normalmaps.", KeyCode.T, true, 0, int.MaxValue, typeof( Texture ), typeof( Texture2D ), typeof( Texture3D ), typeof( Cubemap ), typeof( ProceduralTexture ) )]
+	[NodeAttributes( "Texture Sample", "Textures", "Samples a chosen texture and returns its color values, <b>Texture</b> and <b>UVs</b> can be overriden and you can select different mip modes and levels. It can also unpack and scale textures marked as normalmaps.", KeyCode.T, true, 0, int.MaxValue, typeof( Texture ), typeof( Texture2D ), typeof( Texture3D ), typeof( Cubemap ), typeof( ProceduralTexture ),typeof( RenderTexture )
+#if UNITY_2017_1_OR_NEWER
+		,typeof( CustomRenderTexture )
+#endif
+		)]
 #pragma warning restore 0618
 #endif
 	public sealed class SamplerNode : TexturePropertyNode
@@ -921,23 +926,18 @@ namespace AmplifyShaderEditor
 						isScaledNormal = true;
 					}
 				}
+
+				string scaleValue = isScaledNormal ? m_normalPort.GeneratePortInstructions( ref dataCollector ):"1.0f";
+				m_normalMapUnpackMode = TemplateHelperFunctions.CreateUnpackNormalStr( dataCollector, isScaledNormal , scaleValue );
+
 				if( isScaledNormal )
 				{
-					string scaleValue = m_normalPort.GeneratePortInstructions( ref dataCollector );
-					if( dataCollector.IsTemplate && dataCollector.TemplateDataCollectorInstance.CurrentSRPType == TemplateSRPType.Lightweight )
-					{
-						m_normalMapUnpackMode = "UnpackNormalScale( {0} ," + scaleValue + " )";
-					}
-					else
+					if( !( dataCollector.IsTemplate && dataCollector.IsSRP ) )
 					{
 						dataCollector.AddToIncludes( UniqueId, Constants.UnityStandardUtilsLibFuncs );
-						m_normalMapUnpackMode = "UnpackScaleNormal( {0} ," + scaleValue + " )";
 					}
 				}
-				else
-				{
-					m_normalMapUnpackMode = "UnpackNormal( {0} )";
-				}
+				
 			}
 			if( IsObject && ( !m_texPort.IsConnected || portProperty == "0.0" ) )
 				base.GenerateShaderForOutput( outputId, ref dataCollector, ignoreLocalVar );
@@ -1739,7 +1739,15 @@ namespace AmplifyShaderEditor
 				return false;
 			}
 		}
+		public override void ForceUpdateFromMaterial( Material material )
+		{
+			if( UIUtils.IsProperty( m_currentParameterType ) && material.HasProperty( PropertyName ) )
+			{
+				m_materialValue = material.GetTexture( PropertyName );
+				CheckTextureImporter( true );
+			}
 
+		}
 		public override void SetContainerGraph( ParentGraph newgraph )
 		{
 			base.SetContainerGraph( newgraph );
@@ -1758,11 +1766,20 @@ namespace AmplifyShaderEditor
 				if( value != m_autoUnpackNormals )
 				{
 					m_autoUnpackNormals = value;
-					if( !m_containerGraph.IsLoading )
+					if( !UIUtils.IsLoading )
 					{
 						m_defaultTextureValue = value ? TexturePropertyValues.bump : TexturePropertyValues.white;
 					}
 				}
+			}
+		}
+
+		public override void PropagateNodeData( NodeData nodeData, ref MasterNodeDataCollector dataCollector )
+		{
+			base.PropagateNodeData( nodeData, ref dataCollector );
+			if( dataCollector.IsTemplate && !m_texPort.IsConnected)
+			{
+				dataCollector.TemplateDataCollectorInstance.SetUVUsage( m_textureCoordSet, m_uvPort.DataType );
 			}
 		}
 

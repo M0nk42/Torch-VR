@@ -54,22 +54,25 @@ namespace AmplifyShaderEditor
 			}
 
 			m_modules = new TemplateModulesData( idManager, m_templateProperties, uniquePrefix + "Module", subShaderData.StartIdx, subShaderData.Modules, true );
+			if( m_modules.SRPType == TemplateSRPType.HD )
+			{
+				m_modules.SRPIsPBR = subShaderData.Data.Contains( TemplateHelperFunctions.HDPBRTag );
+			}
 
 			Dictionary<string, TemplateShaderPropertyData> ownDuplicatesDict = new Dictionary<string, TemplateShaderPropertyData>( duplicatesHelper );
 
 			TemplateHelperFunctions.CreateShaderGlobalsList( subShaderData.Modules, ref m_availableShaderGlobals, ref ownDuplicatesDict );
 
 			m_passAmount = subShaderData.Passes.Count;
-
-			if( !m_modules.PassTag.IsValid )
-			{
-				m_modules.PassTag.StartIdx = subShaderData.Passes[ 0 ].GlobalStartIdx;
-				m_templateProperties.AddId( subShaderData.Data, m_modules.PassTag.Id, subShaderData.Passes[ 0 ].LocalStartIdx, m_modules.PassTag.SearchIndentation );
-				m_modules.PassTag.StartIdx -= m_templateProperties.PropertyDict[ m_modules.PassTag.Id ].Indentation.Length;
-				m_templateProperties.PropertyDict[ m_modules.PassTag.Id ].UseIndentationAtStart = true;
-
-				idManager.RegisterId( m_modules.PassTag.StartIdx, m_modules.UniquePrefix + m_modules.PassTag.Id, string.Empty );
-			}
+			
+			//if( !m_modules.PassTag.IsValid )
+			//{
+			//	m_modules.PassTag.StartIdx = subShaderData.Passes[ 0 ].GlobalStartIdx;
+			//	m_templateProperties.AddId( subShaderData.Data, m_modules.PassTag.Id, subShaderData.Passes[ 0 ].LocalStartIdx, m_modules.PassTag.SearchIndentation );
+			//	m_modules.PassTag.StartIdx -= m_templateProperties.PropertyDict[ m_modules.PassTag.Id ].Indentation.Length;
+			//	m_templateProperties.PropertyDict[ m_modules.PassTag.Id ].UseIndentationAtStart = true;
+			//	idManager.RegisterId( m_modules.PassTag.StartIdx, m_modules.UniquePrefix + m_modules.PassTag.Id, string.Empty );
+			//}
 			
 			int firstVisible = -1;
 			int currAddedPassIdx = 0;

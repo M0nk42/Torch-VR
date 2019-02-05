@@ -1,4 +1,4 @@
-Shader /*ase_name*/ "ASETemplateShaders/Legacy/Particles Alpha Blended" /*end*/
+Shader /*ase_name*/ "Hidden/Templates/Legacy/Particles Alpha Blended" /*end*/
 {
 	Properties
 	{

@@ -1,4 +1,10 @@
 sceneSetups:
-- path: Assets/Theo/Theo_scene1.unity
+- path: Assets/Scenes/MasterScene.unity
   isLoaded: 1
   isActive: 1
+- path: Assets/Examples/Scenes/Showcase.unity
+  isLoaded: 1
+  isActive: 0
+- path: Assets/Hugo/Level1.unity
+  isLoaded: 1
+  isActive: 0
