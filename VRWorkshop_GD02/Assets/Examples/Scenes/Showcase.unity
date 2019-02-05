@@ -490,7 +490,7 @@ GameObject:
   - component: {fileID: 717475160}
   - component: {fileID: 717475159}
   - component: {fileID: 717475166}
-  - component: {fileID: 717475167}
+  - component: {fileID: 717475168}
   m_Layer: 0
   m_Name: RightControllerScriptAlias (1)
   m_TagString: Untagged
@@ -694,7 +694,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &717475167
+--- !u!114 &717475168
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -702,21 +702,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 717475157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 362751dab3d80d94197e74b015122865, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b9e34f520812504281d47c483d1c034, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftController: 1
-  rightController: 1
-  engageButton: 10
-  controlOptions: 0
-  directionMethod: 1
-  speedScale: 1
-  maxSpeed: 4
-  deceleration: 0.1
-  fallingDeceleration: 0.01
-  smartDecoupleThreshold: 30
-  sensitivity: 0.02
-  bodyPhysics: {fileID: 0}
+  controllerEvents: {fileID: 0}
+  useButton: 9
+  interactTouch: {fileID: 0}
 --- !u!43 &793360165
 Mesh:
   m_ObjectHideFlags: 0

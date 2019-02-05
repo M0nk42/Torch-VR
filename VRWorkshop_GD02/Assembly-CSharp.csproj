@@ -799,6 +799,7 @@
     <Compile Include="Assets\Scripts\EntropySystem\HeatWave.cs" />
     <Compile Include="Assets\Scripts\EntropySystem\Singleton.cs" />
     <Compile Include="Assets\Scripts\EntropySystem\WarmAttributes.cs" />
+    <Compile Include="Assets\Scripts\VRTK\JVRTK_JoystickRotate.cs" />
     <None Include="Assets\Addons\AmplifyShaderEditor\Examples\Community\LowPolyWater\Credits.txt" />
     <None Include="Assets\Addons\AmplifyShaderEditor\Plugins\EditorResources\Templates\Legacy\Sprites-Default.shader" />
     <None Include="Assets\Addons\AmplifyShaderEditor\Examples\Official\ScreenSpaceDetail\ScreenSpaceDetail.shader" />

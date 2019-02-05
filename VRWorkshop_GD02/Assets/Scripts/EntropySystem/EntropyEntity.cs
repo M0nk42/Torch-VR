@@ -118,7 +118,7 @@ public class EntropyEntity : MonoBehaviour {
         }
         renderer.material.SetFloat("_ice", iceShader);
 
-        Debug.Log("IceShader : " + iceShader);
+        //Debug.Log("IceShader : " + iceShader);
     }
 
     private void Initialize()
