@@ -1,4 +1,4 @@
-Shader /*ase_name*/ "ASETemplateShaders/Legacy/Multi Pass Unlit" /*end*/
+Shader /*ase_name*/ "Hidden/Templates/Legacy/Multi Pass Unlit" /*end*/
 {
 	Properties
 	{
@@ -13,6 +13,8 @@ Shader /*ase_name*/ "ASETemplateShaders/Legacy/Multi Pass Unlit" /*end*/
 		CGINCLUDE
 		#pragma target 3.0 
 		ENDCG
+		
+		/*ase_pass*/
 		Pass
 		{
 			/*ase_main_pass*/
@@ -54,7 +56,11 @@ Shader /*ase_name*/ "ASETemplateShaders/Legacy/Multi Pass Unlit" /*end*/
 				v.vertex.xyz += /*ase_vert_out:Local Vertex;Float3;_Vertex*/ float3(0,0,0) /*end*/;
 				o.pos = UnityObjectToClipPos(v.vertex);
 				#if ASE_SHADOWS
-				TRANSFER_SHADOW(o);
+					#if UNITY_VERSION >= 560
+						UNITY_TRANSFER_SHADOW( o, v.texcoord );
+					#else
+						TRANSFER_SHADOW( o );
+					#endif
 				#endif
 				return o;
 			}
@@ -73,7 +79,8 @@ Shader /*ase_name*/ "ASETemplateShaders/Legacy/Multi Pass Unlit" /*end*/
 			}
 			ENDCG
 		}
-
+		
+		/*ase_pass*/
 		Pass
 		{
 			Name "ForwardAdd"
@@ -116,7 +123,11 @@ Shader /*ase_name*/ "ASETemplateShaders/Legacy/Multi Pass Unlit" /*end*/
 				v.vertex.xyz += /*ase_vert_out:Local Vertex;Float3;_Vertex*/ float3(0,0,0) /*end*/;
 				o.pos = UnityObjectToClipPos(v.vertex);
 				#if ASE_SHADOWS
-				TRANSFER_SHADOW(o);
+					#if UNITY_VERSION >= 560
+						UNITY_TRANSFER_SHADOW( o, v.texcoord );
+					#else
+						TRANSFER_SHADOW( o );
+					#endif
 				#endif
 				return o;
 			}
@@ -136,6 +147,7 @@ Shader /*ase_name*/ "ASETemplateShaders/Legacy/Multi Pass Unlit" /*end*/
 			ENDCG
 		}
 
+		/*ase_pass*/
 		Pass
 		{
 			Name "Deferred"
@@ -176,7 +188,11 @@ Shader /*ase_name*/ "ASETemplateShaders/Legacy/Multi Pass Unlit" /*end*/
 				v.vertex.xyz += /*ase_vert_out:Local Vertex;Float3;_Vertex*/ float3(0,0,0) /*end*/;
 				o.pos = UnityObjectToClipPos(v.vertex);
 				#if ASE_SHADOWS
-				TRANSFER_SHADOW(o);
+					#if UNITY_VERSION >= 560
+						UNITY_TRANSFER_SHADOW( o, v.texcoord );
+					#else
+						TRANSFER_SHADOW( o );
+					#endif
 				#endif
 				return o;
 			}
@@ -192,7 +208,8 @@ Shader /*ase_name*/ "ASETemplateShaders/Legacy/Multi Pass Unlit" /*end*/
 			}
 			ENDCG
 		}
-
+		
+		/*ase_pass*/
 		Pass
 		{
 			/*ase_hide_pass*/

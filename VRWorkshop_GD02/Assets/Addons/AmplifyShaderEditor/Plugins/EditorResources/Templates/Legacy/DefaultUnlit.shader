@@ -1,4 +1,4 @@
-Shader /*ase_name*/ "ASETemplateShaders/Legacy/DefaultUnlit" /*end*/
+Shader /*ase_name*/ "Hidden/Templates/Legacy/DefaultUnlit" /*end*/
 {
 	Properties
 	{
@@ -12,8 +12,8 @@ Shader /*ase_name*/ "ASETemplateShaders/Legacy/DefaultUnlit" /*end*/
 		Tags { "RenderType"="Opaque" }
 		LOD 100
 		Cull Off
-		/*ase_pass*/
 
+		/*ase_pass*/
 		Pass
 		{
 			CGPROGRAM

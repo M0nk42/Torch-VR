@@ -225,9 +225,7 @@ namespace AmplifyShaderEditor
 		private readonly static GUIContent AlphaToCoverageStr = new GUIContent( "Alpha To Coverage", "" );
 		private readonly static GUIContent RenderQueueContent = new GUIContent( "Render Queue", "Base rendering queue index\n(Background = 1000, Geometry = 2000, AlphaTest = 2450, Transparent = 3000, Overlay = 4000)\nDefault: Geometry" );
 		private readonly static GUIContent RenderTypeContent = new GUIContent( "Render Type", "Categorizes shaders into several predefined groups, usually to be used with screen shader effects\nDefault: Opaque" );
-
-		private const string DefaultShaderName = "New AmplifyShader";
-
+		
 		private const string ShaderInputOrderStr = "Shader Input Order";
 
 
@@ -273,11 +271,14 @@ namespace AmplifyShaderEditor
 		
 		[SerializeField]
 		private TemplateAdditionalDirectivesHelper m_additionalDirectives = new TemplateAdditionalDirectivesHelper(" Additional Directives");
-
+		
 		[SerializeField]
 		private AdditionalSurfaceOptionsHelper m_additionalSurfaceOptions = new AdditionalSurfaceOptionsHelper();
 
-		[ SerializeField]
+		[SerializeField]
+		private UsePassHelper m_usePass;
+
+		[SerializeField]
 		private CustomTagsHelper m_customTagsHelper = new CustomTagsHelper();
 
 		[SerializeField]
@@ -436,6 +437,12 @@ namespace AmplifyShaderEditor
 		public override void OnEnable()
 		{
 			base.OnEnable();
+			if( m_usePass == null )
+			{
+				m_usePass = ScriptableObject.CreateInstance<UsePassHelper>();
+				m_usePass.ModuleName = " Additional Use Passes";
+			}
+
 			if( m_fallbackHelper == null )
 				m_fallbackHelper = ScriptableObject.CreateInstance<FallbackPickerHelper>();
 		}
@@ -531,7 +538,7 @@ namespace AmplifyShaderEditor
 
 			AddInputPort( WirePortDataType.FLOAT, false, RefractionStr, index + 2, MasterNodePortCategory.Fragment, 8 );
 			m_refractionPort = m_inputPorts[ m_inputPorts.Count - 1 ];
-			m_inputPorts[ m_inputPorts.Count - 1 ].Locked = ( m_alphaMode == AlphaMode.Opaque || m_alphaMode == AlphaMode.Masked || m_currentLightModel == StandardShaderLightModel.Unlit );
+			m_inputPorts[ m_inputPorts.Count - 1 ].Locked = ( m_alphaMode == AlphaMode.Opaque || m_alphaMode == AlphaMode.Masked || m_currentLightModel == StandardShaderLightModel.Unlit || m_currentLightModel == StandardShaderLightModel.CustomLighting );
 
 			AddInputPort( WirePortDataType.FLOAT, false, AlphaStr, index++, MasterNodePortCategory.Fragment, 9 );
 			m_inputPorts[ m_inputPorts.Count - 1 ].DataName = AlphaDataStr;
@@ -918,6 +925,7 @@ namespace AmplifyShaderEditor
 				//m_additionalIncludes.Draw( this );
 				//m_additionalPragmas.Draw( this );
 				m_additionalSurfaceOptions.Draw( this );
+				m_usePass.Draw( this );
 				m_additionalDirectives.Draw( this );
 				m_customTagsHelper.Draw( this );
 				m_dependenciesHelper.Draw( this );
@@ -1296,6 +1304,10 @@ namespace AmplifyShaderEditor
 			string refractionCode = string.Empty;
 			string refractionInstructions = string.Empty;
 			string refractionFix = string.Empty;
+
+			string aboveUsePasses = string.Empty;
+			string bellowUsePasses = string.Empty;
+			m_usePass.BuildUsePassInfo( ref aboveUsePasses, ref bellowUsePasses, "\t\t" );
 
 			m_currentDataCollector.TesselationActive = m_tessOpHelper.EnableTesselation;
 			m_currentDataCollector.CurrentRenderPath = m_renderPath;
@@ -1834,6 +1846,11 @@ namespace AmplifyShaderEditor
 					tags += m_customTagsHelper.GenerateCustomTags();
 
 					tags = "Tags{ " + tags + " }";
+					if( !string.IsNullOrEmpty( aboveUsePasses ) )
+					{
+						ShaderBody += aboveUsePasses;
+					}
+
 					AddRenderTags( ref ShaderBody, tags );
 					AddShaderLOD( ref ShaderBody, m_shaderLOD );
 					AddRenderState( ref ShaderBody, "Cull", m_inlineCullMode.GetValueOrProperty( m_cullMode.ToString() ) );
@@ -2052,6 +2069,8 @@ namespace AmplifyShaderEditor
 							ShaderBody += "\t\t#define TRANSFORM_TEX(tex,name) float4(tex.xy * name##_ST.xy + name##_ST.zw, tex.z, tex.w)\n";
 						}
 
+						if( m_currentDataCollector.DirtyAppData )
+							ShaderBody += m_currentDataCollector.CustomAppData;
 
 						// Add Input struct
 						if( m_currentDataCollector.DirtyInputs )
@@ -2304,7 +2323,12 @@ namespace AmplifyShaderEditor
 						ShaderBody += "\t\t\t#pragma multi_compile UNITY_PASS_SHADOWCASTER\n";
 						ShaderBody += "\t\t\t#pragma skip_variants FOG_LINEAR FOG_EXP FOG_EXP2\n";
 						ShaderBody += "\t\t\t#include \"HLSLSupport.cginc\"\n";
+#if UNITY_2018_3_OR_NEWER
+						//Preventing WebGL to throw error Duplicate system value semantic definition: input semantic 'SV_POSITION' and input semantic 'VPOS'
+						ShaderBody += "\t\t\t#if ( SHADER_API_D3D11 || SHADER_API_GLCORE || SHADER_API_GLES || SHADER_API_GLES3 || SHADER_API_METAL || SHADER_API_VULKAN )\n";
+#else
 						ShaderBody += "\t\t\t#if ( SHADER_API_D3D11 || SHADER_API_GLCORE || SHADER_API_GLES3 || SHADER_API_METAL || SHADER_API_VULKAN )\n";
+#endif
 						ShaderBody += "\t\t\t\t#define CAN_SKIP_VPOS\n";
 						ShaderBody += "\t\t\t#endif\n";
 						ShaderBody += "\t\t\t#include \"UnityCG.cginc\"\n";
@@ -2351,7 +2375,7 @@ namespace AmplifyShaderEditor
 						ShaderBody += "\t\t\t\tUNITY_VERTEX_INPUT_INSTANCE_ID\n";
 						ShaderBody += "\t\t\t};\n";
 
-						ShaderBody += "\t\t\tv2f vert( appdata_full v )\n";
+						ShaderBody += "\t\t\tv2f vert( "+m_currentDataCollector.CustomAppDataName + " v )\n";
 						ShaderBody += "\t\t\t{\n";
 						ShaderBody += "\t\t\t\tv2f o;\n";
 
@@ -2511,13 +2535,19 @@ namespace AmplifyShaderEditor
 					}
 
 				}
+
+				if( !string.IsNullOrEmpty( bellowUsePasses ) )
+				{
+					ShaderBody += bellowUsePasses;
+				}
+
 				CloseSubShaderBody( ref ShaderBody );
 
 				if( m_dependenciesHelper.HasDependencies )
 				{
 					ShaderBody += m_dependenciesHelper.GenerateDependencies();
 				}
-
+				
 				if( m_fallbackHelper.Active )
 				{
 					ShaderBody += m_fallbackHelper.TabbedFallbackShader;
@@ -2526,7 +2556,7 @@ namespace AmplifyShaderEditor
 				{
 					AddShaderProperty( ref ShaderBody, "Fallback", "Diffuse" );
 				}
-
+				
 				if( !string.IsNullOrEmpty( m_customInspectorName ) )
 				{
 					AddShaderProperty( ref ShaderBody, "CustomEditor", m_customInspectorName );
@@ -2560,18 +2590,20 @@ namespace AmplifyShaderEditor
 				AssetDatabase.Refresh( ImportAssetOptions.ForceUpdate );
 				CurrentShader = Shader.Find( ShaderName );
 			}
-			else
-			{
-				// need to always get asset datapath because a user can change and asset location from the project window 
-				AssetDatabase.ImportAsset( AssetDatabase.GetAssetPath( m_currentShader ) );
-				//ShaderUtil.UpdateShaderAsset( m_currentShader, ShaderBody );
-			}
-
+			//else
+			//{
+			//	// need to always get asset datapath because a user can change and asset location from the project window 
+			//	AssetDatabase.ImportAsset( AssetDatabase.GetAssetPath( m_currentShader ) );
+			//	//ShaderUtil.UpdateShaderAsset( m_currentShader, ShaderBody );
+			//}
+			
 			if( m_currentShader != null )
 			{
+				m_currentDataCollector.UpdateShaderImporter( ref m_currentShader );
 				if( m_currentMaterial != null )
 				{
-					m_currentMaterial.shader = m_currentShader;
+					if( m_currentShader != m_currentMaterial.shader	)	
+						m_currentMaterial.shader = m_currentShader;
 #if UNITY_5_6_OR_NEWER
 					if ( isInstancedShader )
 					{
@@ -2581,10 +2613,8 @@ namespace AmplifyShaderEditor
 					m_currentDataCollector.UpdateMaterialOnPropertyNodes( m_currentMaterial );
 					UpdateMaterialEditor();
 					// need to always get asset datapath because a user can change and asset location from the project window
-					AssetDatabase.ImportAsset( AssetDatabase.GetAssetPath( m_currentMaterial ) );
+					//AssetDatabase.ImportAsset( AssetDatabase.GetAssetPath( m_currentMaterial ) );
 				}
-
-				m_currentDataCollector.UpdateShaderOnPropertyNodes( ref m_currentShader );
 			}
 
 			m_currentDataCollector.Destroy();
@@ -2595,7 +2625,7 @@ namespace AmplifyShaderEditor
 
 		public override void UpdateFromShader( Shader newShader )
 		{
-			if( m_currentMaterial != null )
+			if( m_currentMaterial != null && m_currentMaterial.shader != newShader )
 			{
 				m_currentMaterial.shader = newShader;
 			}
@@ -2630,7 +2660,7 @@ namespace AmplifyShaderEditor
 
 			m_additionalDefines.Destroy();
 			m_additionalDefines = null;
-
+			
 			m_additionalSurfaceOptions.Destroy();
 			m_additionalSurfaceOptions = null;
 
@@ -2657,9 +2687,14 @@ namespace AmplifyShaderEditor
 			m_colorMaskHelper.Destroy();
 			m_colorMaskHelper = null;
 			m_billboardOpHelper = null;
+
 			m_fallbackHelper.Destroy();
 			GameObject.DestroyImmediate( m_fallbackHelper );
 			m_fallbackHelper = null;
+
+			m_usePass.Destroy();
+			GameObject.DestroyImmediate( m_usePass );
+			m_usePass = null;
 		}
 
 		public override int VersionConvertInputPortId( int portId )
@@ -2982,6 +3017,11 @@ namespace AmplifyShaderEditor
 					m_additionalDirectives.AddItems( AdditionalLineType.Pragma, m_additionalPragmas.PragmaList );
 				}
 
+				if( UIUtils.CurrentShaderVersion() > 15402 )
+				{
+					m_usePass.ReadFromString( ref m_currentReadParamIdx, ref nodeParams );
+				}
+
 				m_lightModelChanged = true;
 				m_lastLightModel = m_currentLightModel;
 				DeleteAllInputConnections( true );
@@ -3057,6 +3097,7 @@ namespace AmplifyShaderEditor
 			m_inlineOpacityMaskClipValue.WriteToString( ref nodeInfo );
 			m_additionalDirectives.WriteToString( ref nodeInfo );
 			m_additionalSurfaceOptions.WriteToString( ref nodeInfo );
+			m_usePass.WriteToString( ref nodeInfo );
 		}
 
 		private bool TestCustomBlendMode()

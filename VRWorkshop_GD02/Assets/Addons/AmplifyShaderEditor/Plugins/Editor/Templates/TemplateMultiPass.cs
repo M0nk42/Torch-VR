@@ -54,17 +54,18 @@ namespace AmplifyShaderEditor
 			m_templateType = TemplateDataType.MultiPass;
 		}
 
-		public TemplateMultiPass( string name, string guid )
+		public TemplateMultiPass( string name, string guid , bool isCommunity)
 		{
 			m_templateType = TemplateDataType.MultiPass;
-			Init( name, guid );
+			Init( name, guid , isCommunity);
 		}
 
-		public override void Init( string name, string guid )
+		public override void Init( string name, string guid, bool isCommunity )
 		{
+			base.Init( name, guid, isCommunity );
 			TemplatesManager.CurrTemplateGUIDLoaded = guid;
 			LoadTemplateBody( guid );
-			m_name = string.IsNullOrEmpty( name ) ? m_defaultShaderName : name;
+			Name = string.IsNullOrEmpty( name ) ? m_defaultShaderName : name;
 		}
 
 		void LoadTemplateBody( string guid )
@@ -602,6 +603,12 @@ namespace AmplifyShaderEditor
 			string prefix = string.Empty;
 			switch( type )
 			{
+				//case TemplateModuleDataType.EndPass:
+				//{
+				//	prefix = m_subShaders[ subShaderId ].Passes[ passId ].UniquePrefix;
+				//	m_templateIdManager.SetReplacementText( prefix + TemplatesManager.TemplateEndPassTag, text );
+				//}
+				//break;
 				case TemplateModuleDataType.AllModules:
 				{
 					prefix = m_subShaders[ subShaderId ].Passes[ passId ].Modules.UniquePrefix;
@@ -946,7 +953,7 @@ namespace AmplifyShaderEditor
 			hideFlags = HideFlags.HideAndDontSave;
 		}
 		
-		public override void Reload()
+		public override bool Reload()
 		{
 			m_propertyTag = null;
 			m_shaderNameId = string.Empty;
@@ -969,10 +976,18 @@ namespace AmplifyShaderEditor
 				m_shaderData.Destroy();
 
 			m_templateProperties.Reset();
-			
+
+			string oldName = m_defaultShaderName;	
 			LoadTemplateBody( m_guid );
+
+			if( m_communityTemplate )
+				Name = m_defaultShaderName;
+
+			return !oldName.Equals( m_defaultShaderName );
 		}
 
+		public TemplateSRPType SRPtype { get { return m_subShaders[ 0 ].Modules.SRPType; } }
+		//public bool SRPIsPBRHD { get { return m_subShaders[0].Modules.SRPIsPBRHD ; } }
 		public List<TemplateSubShader> SubShaders { get { return m_subShaders; } }
 		public List<TemplateShaderPropertyData> AvailableShaderProperties { get { return m_availableShaderProperties; } }
 		public TemplateTagData PropertyTag { get { return m_propertyTag; } }

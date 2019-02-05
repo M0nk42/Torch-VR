@@ -24,7 +24,7 @@ namespace AmplifyShaderEditor
 
 		public override string GenerateShaderForOutput( int outputId, ref MasterNodeDataCollector dataCollector, bool ignoreLocalvar )
 		{
-			if( dataCollector.IsTemplate && !dataCollector.IsLightweight )
+			if( dataCollector.IsTemplate && !dataCollector.IsSRP )
 			{
 				return dataCollector.TemplateDataCollectorInstance.GetLightAtten( UniqueId ); ;
 			}

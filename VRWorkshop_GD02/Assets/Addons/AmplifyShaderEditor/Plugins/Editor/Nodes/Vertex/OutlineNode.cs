@@ -1,4 +1,4 @@
-// Amplify Shader Editor - Advanced Bloom Post-Effect for Unity
+// Amplify Shader Editor - Visual Shader Editing Tool
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
@@ -300,6 +300,7 @@ namespace AmplifyShaderEditor
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.Pragmas = outlineDataCollector.Pragmas;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.Defines = outlineDataCollector.Defines;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.Uniforms = outlineDataCollector.Uniforms;
+			ContainerGraph.CurrentStandardSurface.OutlineHelper.GrabPasses = outlineDataCollector.GrabPass;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.UniformList = outlineDataCollector.UniformsList;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.VertexData = outlineDataCollector.VertexData;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.Instructions = outlineDataCollector.Instructions;

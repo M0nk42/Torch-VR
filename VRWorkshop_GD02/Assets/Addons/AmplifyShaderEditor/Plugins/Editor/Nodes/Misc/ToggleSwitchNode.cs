@@ -225,7 +225,7 @@ namespace AmplifyShaderEditor
 		}
 		public override string GetPropertyValue()
 		{
-			return "[Toggle]" + m_propertyName + "(\"" + m_propertyInspectorName + "\", Float) = " + m_currentSelectedInput;
+			return PropertyAttributes + "[Toggle]" + m_propertyName + "(\"" + m_propertyInspectorName + "\", Float) = " + m_currentSelectedInput;
 		}
 
 		public override string GetUniformValue()

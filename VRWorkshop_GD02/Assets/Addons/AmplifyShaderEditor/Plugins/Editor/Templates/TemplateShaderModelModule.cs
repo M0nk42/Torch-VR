@@ -32,11 +32,15 @@ namespace AmplifyShaderEditor
 			}
 		}
 
-		public void CopyFrom( TemplateShaderModelModule other )
+		public void CopyFrom( TemplateShaderModelModule other , bool allData )
 		{
-			m_independentModule = other.IndependentModule;
+			if( allData )
+			{
+				m_independentModule = other.IndependentModule;
+				m_encapsulateOnCGInlude = other.EncapsulateOnCGInlude;
+			}
+
 			m_shaderModelIdx = other.CurrentShaderModel;
-			m_encapsulateOnCGInlude = other.EncapsulateOnCGInlude;
 		}
 
 		public override void ReadFromString( ref uint index, ref string[] nodeParams )

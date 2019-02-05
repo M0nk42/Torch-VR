@@ -93,7 +93,7 @@ namespace AmplifyShaderEditor
 			if( dataCollector.IsTemplate )
 			{
 				dataCollector.AddToIncludes( UniqueId, Constants.UnityLightingLib );
-				//string worldPos = dataCollector.TemplateDataCollectorInstance.GetWorldPos();
+				string worldPos = dataCollector.TemplateDataCollectorInstance.GetWorldPos();
 				string worldViewDir = dataCollector.TemplateDataCollectorInstance.GetViewDir( false, MasterNodePortCategory.Fragment );
 				//string worldNormal = dataCollector.TemplateDataCollectorInstance.GetWorldNormal( PrecisionType.Float );
 
@@ -115,8 +115,8 @@ namespace AmplifyShaderEditor
 
 				dataCollector.AddLocalVariable( UniqueId, "UnityGIInput data;" );
 				dataCollector.AddLocalVariable( UniqueId, "UNITY_INITIALIZE_OUTPUT( UnityGIInput, data );" );
-				//dataCollector.AddLocalVariable( UniqueId, "data.worldPos = " + worldPos + ";" );
-				//dataCollector.AddLocalVariable( UniqueId, "data.worldViewDir = " + worldViewDir + ";" );
+				dataCollector.AddLocalVariable( UniqueId, "data.worldPos = " + worldPos + ";" );
+				dataCollector.AddLocalVariable( UniqueId, "data.worldViewDir = " + worldViewDir + ";" );
 				dataCollector.AddLocalVariable( UniqueId, "data.probeHDR[0] = unity_SpecCube0_HDR;" );
 				dataCollector.AddLocalVariable( UniqueId, "data.probeHDR[1] = unity_SpecCube1_HDR;" );
 				dataCollector.AddLocalVariable( UniqueId, "#if UNITY_SPECCUBE_BLENDING || UNITY_SPECCUBE_BOX_PROJECTION //specdataif0" );

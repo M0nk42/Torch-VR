@@ -1,4 +1,4 @@
-// Amplify Shader Editor - Advanced Bloom Post-Effect for Unity
+// Amplify Shader Editor - Visual Shader Editing Tool
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using UnityEditor;
@@ -136,6 +136,7 @@ namespace AmplifyShaderEditor
 		public static EditorVariableBool ExpandedDepth = new EditorVariableBool( "ASEExpandedDepth", " ExpandedDepth", false );
 		public static EditorVariableBool ExpandedTesselation  = new EditorVariableBool( "ASEExpandedTesselation", " ExpandedTesselation", false );
 		public static EditorVariableBool ExpandedProperties = new EditorVariableBool( "ASEExpandedProperties", " ExpandedProperties", false );
+		public static EditorVariableBool ExpandedUsePass = new EditorVariableBool( "ASEUsePass", " UsePass", false );
 		//Templates
 		public static EditorVariableBool ExpandedBlendModeModule = new EditorVariableBool( "ASEExpandedBlendModeModule", " ExpandedBlendModeModule", false );
 	}
@@ -189,6 +190,8 @@ namespace AmplifyShaderEditor
 		private bool m_expandedTesselation = false;
 		[SerializeField]
 		private bool m_expandedProperties = false;
+		[SerializeField]
+		private bool m_expandedUsePass = false;
 
 		public void Initialize()
 		{
@@ -215,6 +218,7 @@ namespace AmplifyShaderEditor
 			m_expandedDepth = EditorVariablesManager.ExpandedDepth.Value;
 			m_expandedTesselation = EditorVariablesManager.ExpandedTesselation.Value;
 			m_expandedProperties = EditorVariablesManager.ExpandedProperties.Value;
+			m_expandedUsePass = EditorVariablesManager.ExpandedUsePass.Value;
 		}
 
 		public bool LiveMode{ get { return m_liveMode; } set { m_liveMode = value; EditorVariablesManager.LiveMode.Value = value; } }
@@ -240,5 +244,6 @@ namespace AmplifyShaderEditor
 		public bool ExpandedDepth { get { return m_expandedDepth; } set { m_expandedDepth = value; EditorVariablesManager.ExpandedDepth.Value = value; } }
 		public bool ExpandedTesselation { get { return m_expandedTesselation; } set { m_expandedTesselation = value; EditorVariablesManager.ExpandedTesselation.Value = value; } }
 		public bool ExpandedProperties { get { return m_expandedProperties; } set { m_expandedProperties = value; EditorVariablesManager.ExpandedProperties.Value = value; } }
+		public bool ExpandedUsePass { get { return m_expandedUsePass; } set { m_expandedUsePass = value; EditorVariablesManager.ExpandedUsePass.Value = value; } }
 	}
 }

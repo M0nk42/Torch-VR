@@ -129,14 +129,14 @@ namespace AmplifyShaderEditor
 			EditorGUILayout.EndHorizontal();
 		}
 
-		public string GetValueOrProperty()
+		public string GetValueOrProperty( bool parentesis = true )
 		{
 			if( m_active )
 			{
 				PropertyNode node = GetPropertyNode();
 				if( node != null )
 				{
-					return "[" + node.PropertyName + "]";
+					return parentesis?"[" + node.PropertyName + "]": node.PropertyName;
 				}
 				else
 				{
@@ -158,10 +158,7 @@ namespace AmplifyShaderEditor
 				PropertyNode node = GetPropertyNode();
 				if( node != null )
 				{
-					if( parentesis )
-						return "[" + node.PropertyName + "]";
-					else
-						return node.PropertyName;
+					return parentesis?"[" + node.PropertyName + "]": node.PropertyName;
 				}
 				else if( !string.IsNullOrEmpty( defaultValue ) )
 				{

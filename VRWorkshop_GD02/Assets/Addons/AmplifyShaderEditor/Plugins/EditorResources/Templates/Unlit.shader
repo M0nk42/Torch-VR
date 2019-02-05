@@ -1,4 +1,4 @@
-Shader /*ase_name*/ "ASETemplateShaders/Unlit" /*end*/
+Shader /*ase_name*/ "Hidden/Templates/Unlit" /*end*/
 {
 	Properties
 	{
@@ -14,9 +14,11 @@ Shader /*ase_name*/ "ASETemplateShaders/Unlit" /*end*/
 
 		Pass
 		{
+			Name "Unlit"
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
+			#pragma multi_compile_instancing
 			#include "UnityCG.cginc"
 			/*ase_pragma*/
 
@@ -30,8 +32,9 @@ Shader /*ase_name*/ "ASETemplateShaders/Unlit" /*end*/
 			struct v2f
 			{
 				float4 vertex : SV_POSITION;
-				UNITY_VERTEX_OUTPUT_STEREO
 				/*ase_interp(0,):sp=sp.xyzw*/
+				UNITY_VERTEX_OUTPUT_STEREO
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
 			/*ase_globals*/
@@ -41,6 +44,8 @@ Shader /*ase_name*/ "ASETemplateShaders/Unlit" /*end*/
 				v2f o;
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+				UNITY_TRANSFER_INSTANCE_ID(v, o);
+
 				/*ase_vert_code:v=appdata;o=v2f*/
 				
 				v.vertex.xyz += /*ase_vert_out:Local Vertex;Float3*/ float3(0,0,0) /*end*/;
@@ -50,6 +55,7 @@ Shader /*ase_name*/ "ASETemplateShaders/Unlit" /*end*/
 			
 			fixed4 frag (v2f i /*ase_frag_input*/) : SV_Target
 			{
+				UNITY_SETUP_INSTANCE_ID(i);
 				fixed4 finalColor;
 				/*ase_frag_code:i=v2f*/
 				
