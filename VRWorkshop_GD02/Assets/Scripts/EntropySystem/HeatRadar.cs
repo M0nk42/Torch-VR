@@ -27,6 +27,7 @@ public class HeatRadar : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
         foreach (var coldObject in ColdObjects)
         {
             float distance = Vector3.Distance(coldObject.transform.position, transform.position);

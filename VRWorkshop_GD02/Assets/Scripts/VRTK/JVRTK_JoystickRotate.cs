@@ -39,8 +39,7 @@ public class JVRTK_JoystickRotate : MonoBehaviour {
 
     private void Update()
     {
-
-        ManageUseListener(true);
+        //Debug.Log(controllerEvents.GetAxis(VRTK_ControllerEvents.Vector2AxisAlias.Touchpad));
     }
 
     protected virtual void OnDisable()
@@ -55,6 +54,7 @@ public class JVRTK_JoystickRotate : MonoBehaviour {
 
     private void ManageUseListener(bool state)
     {
+        
         if (controllerEvents != null && subscribedUseButton != VRTK_ControllerEvents.ButtonAlias.Undefined && (!state || useButton != subscribedUseButton))
         {
             controllerEvents.UnsubscribeToButtonAliasEvent(subscribedUseButton, true, StartDoTurn);
@@ -79,12 +79,12 @@ public class JVRTK_JoystickRotate : MonoBehaviour {
     protected virtual void StartDoTurn(object sender, ControllerInteractionEventArgs e)
     {
         OnUseButtonPressed(controllerEvents.SetControllerEvent(ref usePressed, true));
-        AttemptDoTurn();
+        Debug.Log(e);
+        //AttemptDoTurn(sender);
     }
 
     protected virtual void AttemptDoTurn()
     {
         Debug.Log("Pressed");
-        Debug.Log(controllerEvents);
     }
 }
