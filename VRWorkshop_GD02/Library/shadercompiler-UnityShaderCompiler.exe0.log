@@ -12,6 +12,7 @@ Cmd: compileSnippet
 =======
 Base path: C:/Program Files/Unity/Hub/Editor/2018.2.20f1/Editor/Data
 Cmd: initializeCompiler
+<<<<<<< HEAD
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: compileSnippet
@@ -88,3 +89,5 @@ Cmd: initializeCompiler
 >>>>>>> Init James
 =======
 >>>>>>> Soufflet WIP
+=======
+>>>>>>> New Stable

@@ -79,7 +79,6 @@ public class JVRTK_JoystickRotate : MonoBehaviour {
     protected virtual void StartDoTurn(object sender, ControllerInteractionEventArgs e)
     {
         OnUseButtonPressed(controllerEvents.SetControllerEvent(ref usePressed, true));
-        Debug.Log(e);
         //AttemptDoTurn(sender);
     }
 
