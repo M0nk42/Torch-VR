@@ -1,24 +1,59 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VRTK;
+using VRTK.Controllables;
+using VRTK.Controllables.ArtificialBased;
 
 public class SouffletBehavior : MonoBehaviour {
 
-    Collider windCollider;
-    public GameObject OppositePanel;
+    VRTK_BaseControllable controllable;
+    bool windUp = false;
 
-	// Use this for initialization
-	void Start () {
-        windCollider = GetComponent<Collider>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public GameObject Poellon;
+    PoellonBehavior poellonBehavior;
 
-    private void OnCollisionEnter(Collision collision)
+    void OnEnable()
     {
-        Debug.Log("This is a collider !" + collision);
+        controllable = (controllable == null ? GetComponent<VRTK_BaseControllable>() : controllable);
+        controllable.ValueChanged -= OnValueChanged;
+        controllable.ValueChanged += OnValueChanged;
+    }
+
+    void OnDisable()
+    {
+        controllable.ValueChanged -= OnValueChanged;
+
+    }
+
+    void Start () {
+
+        poellonBehavior = Poellon.GetComponent<PoellonBehavior>();
+
+	}
+
+
+    // Update is called once per frame
+    void Update () {
+
+    }
+
+    //Positive value
+    private void OnValueChanged(object sender, ControllableEventArgs args)
+    {
+        float value = args.normalizedValue;
+
+        if (value > 0.8f)
+        {
+            windUp = true;
+        }
+
+        if (windUp && value < 0.15)
+        {
+            windUp = false;
+
+            poellonBehavior.AddPower();
+            
+        }
     }
 }

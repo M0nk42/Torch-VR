@@ -10,6 +10,9 @@ public class HeatRadar : MonoBehaviour {
     //LayerMask
     LayerMask coldLayer;
     public string coldLayerName = "ColdObject";
+
+    LayerMask flareLayer;
+    public string flareLayerName = "Flare";
     public float intensity = 1;
 
     //Get all the objects in range.
@@ -21,6 +24,7 @@ public class HeatRadar : MonoBehaviour {
         radius = WarmZone.radius;
 
         coldLayer = LayerMask.NameToLayer(coldLayerName);
+        flareLayer = LayerMask.NameToLayer(flareLayerName);
 
         ColdObjects = new List<GameObject>();
 	}
@@ -44,8 +48,23 @@ public class HeatRadar : MonoBehaviour {
         Destroy(gameObject);
     }
 
+    public void AddPower()
+    {
+        radius =+ 1;
+        intensity = +1;
+    }
+
+    public void RemovePower()
+    {
+        radius =- 1;
+        intensity = -1;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log(other.gameObject.layer);
+
+        //Melt frozen object
         if (other.gameObject.layer == coldLayer.value)
         {
             Debug.Log(other.gameObject);
@@ -60,6 +79,24 @@ public class HeatRadar : MonoBehaviour {
                 //Increment warmth
                 EntropyEntity coldObject = other.gameObject.GetComponent<EntropyEntity>();
                 coldObject.HeatRadars.Add(gameObject);
+            }
+        }
+
+        //Light Up flare
+
+        if (other.gameObject.layer == flareLayer.value)
+        {
+            Debug.Log(other.gameObject);
+
+            //Test if the gameObject HAS the HeatWave Behavior
+            if (other.gameObject.GetComponent<FlareBehaviour>())
+            {
+                Debug.Log("ENTERING: Is Flare");
+
+                //Increment warmth
+                FlareBehaviour flare = other.gameObject.GetComponent<FlareBehaviour>();
+                flare.LightFlare();
+
             }
         }
     }
